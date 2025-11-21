@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Color Spotter Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="homeScreen" class="screen">
+    <div class="topbar">
+        <span id="currencyDisplay">Points: 0</span>
+    </div>
+    <h1>Color Spotter</h1>
+    <button onclick="startGame()">Play</button>
+    <button onclick="openShop()">Shop</button>
+    <button onclick="openSettings()">Settings</button>
+</div>
+
+<div id="gameScreen" class="screen hidden">
+    <div class="topbar">
+        <span id="scoreDisplay">Score: 0</span>
+        <span id="timerDisplay">Time: 0.00</span>
+    </div>
+    <h2>Find the Different Color!</h2>
+    <div id="grid"></div>
+    <button onclick="goHome()">Home</button>
+</div>
+
+<div id="shopScreen" class="screen hidden">
+    <div class="topbar">
+        <span id="currencyDisplayShop">Points: 0</span>
+    </div>
+    <h1>Shop</h1>
+
+    <div class="shopItem">
+        <span>Hint (shows answer for 1 round) — 10 pts</span>
+        <button onclick="buyHint()">Buy</button>
+    </div>
+
+    <div class="shopItem">
+        <span>Theme: Dark Mode — 50 pts</span>
+        <button onclick="buyTheme('dark')">Buy</button>
+    </div>
+
+    <button onclick="goHome()">Home</button>
+</div>
+
+<div id="settingsScreen" class="screen hidden">
+    <h1>Settings</h1>
+
+    <p>Theme: <span id="currentTheme">Default</span></p>
+    <button onclick="applyTheme('default')">Default</button>
+    <button onclick="applyTheme('dark')">Dark (must be purchased)</button>
+
+    <button onclick="goHome()">Home</button>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
