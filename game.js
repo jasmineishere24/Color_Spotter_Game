@@ -18,7 +18,8 @@ const settingsScreen = document.getElementById("settingsScreen");
 function updateUI() {
     document.getElementById("currencyDisplay").innerText = `Points: ${currency}`;
     document.getElementById("currencyDisplayShop").innerText = `Points: ${currency}`;
-    document.getElementById("currentTheme").innerText = document.body.classList.contains("dark") ? "Dark" : "Default";
+    document.getElementById("currentTheme").innerText =
+        document.body.classList.contains("dark") ? "Dark" : "Default";
 }
 
 updateUI();
@@ -41,7 +42,7 @@ function openSettings() {
 }
 
 function hideAll() {
-    document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
+    document.querySelectorAll(".screen").forEach((s) => s.classList.add("hidden"));
 }
 
 // GAME START
@@ -58,32 +59,33 @@ function nextRound() {
     timerStart = performance.now();
 
     document.getElementById("scoreDisplay").innerText = `Score: ${score}`;
-    
+
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
 
-    // --- Improved color logic ---
+    // --- NEW, GUARANTEED-VISIBLE COLOR LOGIC ---
     const baseColor = randomColor();
 
-    // Larger difference early, smaller later. Minimum 12.
-    let difference = Math.max(65 - difficulty * 4, 12);
+    // Early rounds → VERY obvious difference | Later → smaller
+    let difference = 180 - difficulty * 10;
+    difference = Math.max(difference, 20); // Never invisible
 
-    const diffColor = adjustColor(baseColor, difference);
+    const diffColor = adjustColorStrong(baseColor, difference);
 
+    // Choose which of the 9 tiles is correct
     correctIndex = Math.floor(Math.random() * 9);
 
     for (let i = 0; i < 9; i++) {
         const div = document.createElement("div");
         div.classList.add("gridItem");
 
-        // Apply colors
         div.style.background = i === correctIndex ? diffColor : baseColor;
 
         div.onclick = () => handleGuess(i);
         grid.appendChild(div);
     }
 
-    // Auto-hint
+    // Auto hint if user purchased
     if (hintCount > 0) {
         hintCount--;
         localStorage.setItem("hints", hintCount);
@@ -91,6 +93,7 @@ function nextRound() {
     }
 }
 
+// HANDLE GUESS
 function handleGuess(i) {
     const timeTaken = (performance.now() - timerStart) / 1000;
 
@@ -113,21 +116,22 @@ function endGame() {
 // UTILITIES ----------------------------------------------------
 
 function randomColor() {
-    const r = Math.floor(Math.random()*255);
-    const g = Math.floor(Math.random()*255);
-    const b = Math.floor(Math.random()*255);
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-function adjustColor(rgb, amount) {
+// NEW strong color adjuster (always visible)
+function adjustColorStrong(rgb, amount) {
     let [r, g, b] = rgb.match(/\d+/g).map(Number);
 
-    // Randomly choose one channel to change
-    let channel = Math.floor(Math.random() * 3);
+    // Randomly choose to lighten or darken
+    const dir = Math.random() > 0.5 ? 1 : -1;
 
-    if (channel === 0) r = clamp(r + amount);
-    if (channel === 1) g = clamp(g + amount);
-    if (channel === 2) b = clamp(b + amount);
+    r = clamp(r + dir * amount);
+    g = clamp(g + dir * amount);
+    b = clamp(b + dir * amount);
 
     return `rgb(${r}, ${g}, ${b})`;
 }
@@ -159,11 +163,13 @@ function buyHint() {
 
 function buyTheme(name) {
     if (name === "dark") {
-        if (purchasedThemes.includes("dark")) return alert("Already purchased!");
+        if (purchasedThemes.includes("dark"))
+            return alert("Already purchased!");
         if (currency < 50) return alert("Not enough points!");
         currency -= 50;
         purchasedThemes.push("dark");
     }
+
     save();
     updateUI();
 }
