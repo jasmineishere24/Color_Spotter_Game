@@ -62,8 +62,13 @@ function nextRound() {
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
 
+    // --- Improved color logic ---
     const baseColor = randomColor();
-    let diffColor = adjustColor(baseColor, difficulty * 3);
+
+    // Larger difference early, smaller later. Minimum 12.
+    let difference = Math.max(65 - difficulty * 4, 12);
+
+    const diffColor = adjustColor(baseColor, difference);
 
     correctIndex = Math.floor(Math.random() * 9);
 
@@ -71,7 +76,7 @@ function nextRound() {
         const div = document.createElement("div");
         div.classList.add("gridItem");
 
-        // Mobile-friendly square coloring
+        // Apply colors
         div.style.background = i === correctIndex ? diffColor : baseColor;
 
         div.onclick = () => handleGuess(i);
@@ -105,7 +110,8 @@ function endGame() {
     goHome();
 }
 
-// UTILITIES
+// UTILITIES ----------------------------------------------------
+
 function randomColor() {
     const r = Math.floor(Math.random()*255);
     const g = Math.floor(Math.random()*255);
@@ -114,11 +120,20 @@ function randomColor() {
 }
 
 function adjustColor(rgb, amount) {
-    let [r,g,b] = rgb.match(/\d+/g).map(Number);
-    r = Math.min(255, r + amount);
-    g = Math.min(255, g + amount);
-    b = Math.min(255, b + amount);
+    let [r, g, b] = rgb.match(/\d+/g).map(Number);
+
+    // Randomly choose one channel to change
+    let channel = Math.floor(Math.random() * 3);
+
+    if (channel === 0) r = clamp(r + amount);
+    if (channel === 1) g = clamp(g + amount);
+    if (channel === 2) b = clamp(b + amount);
+
     return `rgb(${r}, ${g}, ${b})`;
+}
+
+function clamp(v) {
+    return Math.min(255, Math.max(0, v));
 }
 
 function highlightCorrect() {
@@ -128,7 +143,8 @@ function highlightCorrect() {
     item.style.outlineOffset = "-4px";
 }
 
-// SHOP ITEMS
+// SHOP ITEMS ---------------------------------------------------
+
 function buyHint() {
     if (currency >= 10) {
         currency -= 10;
